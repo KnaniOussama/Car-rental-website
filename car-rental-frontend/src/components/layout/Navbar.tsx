@@ -1,8 +1,9 @@
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { ModeToggle } from "@/components/mode-toggle";
-import { Car } from "lucide-react";
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { ModeToggle } from '@/components/mode-toggle';
+import { Car } from 'lucide-react';
+import { useAuthModal } from '@/contexts/AuthModalContext';
 
 interface NavbarProps {
   isAuthenticated: boolean;
@@ -10,16 +11,13 @@ interface NavbarProps {
   onLogout: () => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({
-  isAuthenticated,
-  isAdmin,
-  onLogout,
-}) => {
+const Navbar: React.FC<NavbarProps> = ({ isAuthenticated, isAdmin, onLogout }) => {
   const navigate = useNavigate();
+  const { openAuthModal } = useAuthModal();
 
   const handleLogout = () => {
     onLogout();
-    navigate("/");
+    navigate('/');
   };
 
   return (
@@ -30,15 +28,19 @@ const Navbar: React.FC<NavbarProps> = ({
       </Link>
       <div className="flex items-center gap-4">
         <ModeToggle />
-
-        {isAuthenticated && isAdmin && (
-          <Button variant="outline" onClick={() => navigate("/dashboard")}>
-            Dashboard
+        {isAuthenticated ? (
+          <>
+            {isAdmin && (
+              <Button variant="outline" onClick={() => navigate('/dashboard')}>
+                Dashboard
+              </Button>
+            )}
+            <Button onClick={handleLogout}>Logout</Button>
+          </>
+        ) : (
+          <Button variant="outline" onClick={openAuthModal}>
+            Register or Login
           </Button>
-        )}
-        {isAuthenticated && <Button onClick={handleLogout}>Logout</Button>}
-        {!isAuthenticated && (
-          <Button onClick={() => navigate("/login")}>Login</Button>
         )}
       </div>
     </header>
@@ -46,3 +48,4 @@ const Navbar: React.FC<NavbarProps> = ({
 };
 
 export default Navbar;
+

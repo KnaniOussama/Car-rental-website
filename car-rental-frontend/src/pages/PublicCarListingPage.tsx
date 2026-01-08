@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider'; // Import the new Slider component
+import { Slider } from '@/components/ui/slider';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { Car as CarIcon, GaugeCircle, Users } from 'lucide-react';
 import api from '@/services/api';
 
 // Car Interface matching backend schema
@@ -120,36 +122,45 @@ const PublicCarListingPage: React.FC = () => {
             {filteredCars.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {filteredCars.map((car) => (
-                  <Card key={car._id} className="overflow-hidden flex flex-col hover:shadow-lg transition-shadow duration-300">
-                    {car.image ? (
+                  <Card key={car._id} className="group overflow-hidden flex flex-col hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1">
+                    <div className="overflow-hidden">
                       <img
-                        src={car.image}
+                        src={car.image || 'https://via.placeholder.com/400x250.png/E0E0E0/000000?text=No+Image'}
                         alt={`${car.brand} ${car.model}`}
-                        className="w-full h-48 object-cover"
+                        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300 ease-in-out"
                       />
-                    ) : (
-                      <div className="w-full h-48 bg-muted flex items-center justify-center">
-                        <span className="text-muted-foreground">No Image</span>
-                      </div>
-                    )}
-                    <CardHeader>
-                      <CardTitle className="text-xl">{car.brand} {car.model}</CardTitle>
-                      <p className="text-sm text-muted-foreground">{car.year}</p>
-                    </CardHeader>
-                    <div className="px-6">
-                      <div className="text-2xl font-bold text-primary">${car.price}/day</div>
                     </div>
-                    <CardContent className="space-y-2 flex-grow pt-4 flex flex-col justify-between">
-                      <div>
-                        <p><strong>Specifications:</strong> {car.specifications.join(', ')}</p>
-                        <p><strong>Total Kilometers:</strong> {car.totalKilometers} km</p>
-                      </div>
-                      <div className="mt-4">
-                        <Button asChild className="w-full">
-                          <Link to={`/book/${car._id}`}>Book Now</Link>
-                        </Button>
+                    <CardHeader>
+                      <CardTitle className="text-xl tracking-tight">{car.brand} {car.model}</CardTitle>
+                      <CardDescription>{car.year}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4 flex-grow">
+                      <div className="text-3xl font-bold text-primary">${car.price}<span className="text-sm font-normal text-muted-foreground">/day</span></div>
+                      <Separator />
+                      <div className="flex justify-around text-muted-foreground text-sm">
+                        <div className="flex items-center gap-2">
+                          <GaugeCircle className="h-4 w-4" />
+                          <span>{car.totalKilometers.toLocaleString()} km</span>
+                        </div>
+                        {car.specifications.find(s => s.toLowerCase().includes('seat')) && (
+                           <div className="flex items-center gap-2">
+                             <Users className="h-4 w-4" />
+                             <span>{car.specifications.find(s => s.toLowerCase().includes('seat'))}</span>
+                           </div>
+                        )}
+                        {car.specifications.find(s => !s.toLowerCase().includes('seat')) && (
+                           <div className="flex items-center gap-2">
+                            <CarIcon className="h-4 w-4" />
+                            <span>{car.specifications.find(s => !s.toLowerCase().includes('seat'))}</span>
+                           </div>
+                        )}
                       </div>
                     </CardContent>
+                    <CardFooter>
+                      <Button asChild className="w-full">
+                        <Link to={`/book/${car._id}`}>Book Now</Link>
+                      </Button>
+                    </CardFooter>
                   </Card>
                 ))}
               </div>

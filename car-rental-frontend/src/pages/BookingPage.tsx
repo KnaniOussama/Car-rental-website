@@ -1,17 +1,18 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { differenceInCalendarDays } from 'date-fns';
-import { DateRange } from 'react-day-picker';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { DateRangePicker } from '@/components/ui/DateRangePicker';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
-import { User, Fuel, Baby } from 'lucide-react';
-import { DateRangePicker } from '@/components/ui/DateRangePicker';
+import { useAuthModal } from '@/contexts/AuthModalContext';
 import api from '@/services/api';
+import { Checkbox } from '@radix-ui/react-checkbox';
+import { differenceInCalendarDays } from 'date-fns';
+import { Baby, Fuel, SeparatorHorizontal, User } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { DateRange } from 'react-day-picker';
+import { useParams } from 'react-router-dom';
 
 // Car Interface
 interface Car {
@@ -22,6 +23,10 @@ interface Car {
   price: number;
   specifications: string[];
   image?: string;
+}
+
+interface BookingPageProps {
+  isAuthenticated: boolean;
 }
 
 // Prices for options and insurance
@@ -37,11 +42,12 @@ const insurancePrices = {
   none: 0,
 };
 
-const BookingPage: React.FC = () => {
+const BookingPage: React.FC<BookingPageProps> = ({ isAuthenticated }) => {
   const { carId } = useParams<{ carId: string }>();
   const [car, setCar] = useState<Car | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { openAuthModal } = useAuthModal();
 
   // State for the date range picker
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
@@ -73,9 +79,7 @@ const BookingPage: React.FC = () => {
       setError(null);
       try {
         const response = await api.get<Car>(`/cars/${carId}`);
-        let car = response.data;
-        if(!car.price) car = { ...car, price: 30 } //fallback temporary
-        setCar(car);
+        setCar(response.data);
       } catch (err) {
         setError('Failed to load car details. The car may not exist.');
         console.error(err);
@@ -121,6 +125,23 @@ const BookingPage: React.FC = () => {
     setFormData(prev => ({ ...prev, [id]: value }));
   };
 
+  const handleBooking = () => {
+    if (!isAuthenticated) {
+      openAuthModal();
+    } else {
+      // In a real app, this would proceed to a payment gateway or booking confirmation
+      console.log('User is authenticated, proceeding with booking:', {
+        carId,
+        dateRange,
+        options,
+        insurance,
+        formData,
+        totalPrice,
+      });
+      alert('Booking successful! (See console for details)');
+    }
+  };
+
   if (isLoading) {
     return <div className="container mx-auto text-center py-20">Loading car details...</div>;
   }
@@ -150,7 +171,7 @@ const BookingPage: React.FC = () => {
                 <DateRangePicker date={dateRange} onDateChange={setDateRange} />
               </div>
 
-              <Separator />
+              <SeparatorHorizontal />
 
               {/* Rental Options */}
               <div className="space-y-4">
@@ -244,7 +265,7 @@ const BookingPage: React.FC = () => {
                 </div>
               </div>
               
-              <Button size="lg" className="w-full" disabled={numberOfDays <= 0}>
+              <Button size="lg" className="w-full" disabled={numberOfDays <= 0} onClick={handleBooking}>
                 {numberOfDays > 0 ? `Book for ${numberOfDays} Days` : 'Please select a date range'}
               </Button>
             </CardContent>
@@ -297,4 +318,5 @@ const BookingPage: React.FC = () => {
 };
 
 export default BookingPage;
+
 

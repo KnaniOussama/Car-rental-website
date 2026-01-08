@@ -13,7 +13,7 @@ router.get('/', carController.getAvailableCars);
 router.post('/', authMiddleware, validate(createCarSchema), carController.createCar);
 router.get('/admin', authMiddleware, carController.getAllCars);
 router.get('/stats', authMiddleware, carController.getCarStats);
-router.get('/:id', authMiddleware, carController.getCarById);
+router.get('/:id', carController.getCarById);
 router.put('/:id', authMiddleware, validate(updateCarSchema), carController.updateCar);
 router.delete('/:id', authMiddleware, carController.deleteCar);
 router.put('/:id/status', authMiddleware, validate(carStatusSchema), carController.updateCarStatus);
