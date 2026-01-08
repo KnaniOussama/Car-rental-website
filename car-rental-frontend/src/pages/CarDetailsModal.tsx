@@ -17,6 +17,7 @@ interface Car {
   brand: string;
   model: string;
   year: number;
+  price: number;
   specifications: string[]; // Array of strings
   status: 'AVAILABLE' | 'RESERVED' | 'MAINTENANCE';
   totalKilometers: number;
@@ -90,6 +91,9 @@ const CarDetailsModal: React.FC<CarDetailsModalProps> = ({
             </p>
             <p>
               <strong>Year:</strong> {car.year}
+            </p>
+            <p>
+              <strong>Price:</strong> ${car.price}/day
             </p>
             <p>
               <strong>Specifications:</strong> {car.specifications.join(', ')}

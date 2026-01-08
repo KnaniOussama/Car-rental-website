@@ -38,7 +38,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent} from '@/components/ui/card';
 import { MoreHorizontal } from 'lucide-react';
 import CarForm from './CarForm';
 import CarDetailsModal from './CarDetailsModal';
@@ -53,12 +53,12 @@ import {
 } from '@/components/ui/select';
 import api from '@/services/api';
 
-// Interfaces... (assuming they are defined as before)
 interface Car {
   _id: string;
   brand: string;
   model: string;
   year: number;
+  price: number;
   specifications: string[];
   status: 'AVAILABLE' | 'RESERVED' | 'MAINTENANCE';
   totalKilometers: number;
@@ -83,7 +83,6 @@ interface ActivityLog {
 }
 
 const CarManagementPage: React.FC = () => {
-  // All state declarations... (assuming they are defined as before)
   const [cars, setCars] = useState<Car[]>([]);
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
@@ -97,7 +96,6 @@ const CarManagementPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<Car['status'] | 'ALL'>('ALL');
 
-  // All functions... (assuming they are defined as before)
   const fetchCars = async () => {
     try {
       const response = await api.get('/cars/admin');
@@ -127,7 +125,7 @@ const CarManagementPage: React.FC = () => {
     try {
       await api.post('/cars', {
         ...newCarValues,
-        specifications: newCarValues.specifications.split(',').map((s: string) => s.trim()),
+        specifications: newCarValues.specifications,
       });
       fetchCars();
       setIsFormDialogOpen(false);
@@ -137,10 +135,14 @@ const CarManagementPage: React.FC = () => {
   };
   const handleUpdateCar = async (updatedCarValues: any) => {
     if (!selectedCar) return;
+    delete updatedCarValues._id;
+    delete updatedCarValues.createdAt
+    delete updatedCarValues.updatedAt
+    delete updatedCarValues.__v
     try {
       await api.put(`/cars/${selectedCar._id}`, {
         ...updatedCarValues,
-        specifications: updatedCarValues.specifications.split(',').map((s: string) => s.trim()),
+        specifications: updatedCarValues.specifications,
       });
       fetchCars();
       setIsFormDialogOpen(false);
@@ -283,6 +285,7 @@ const CarManagementPage: React.FC = () => {
                 <TableHead>Brand</TableHead>
                 <TableHead className="hidden md:table-cell">Model</TableHead>
                 <TableHead className="hidden lg:table-cell">Year</TableHead>
+                <TableHead className="hidden lg:table-cell">Price</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="hidden lg:table-cell">Total KM</TableHead>
                 <TableHead className="hidden md:table-cell">KM Since Maint.</TableHead>
@@ -295,6 +298,7 @@ const CarManagementPage: React.FC = () => {
                   <TableCell className="font-medium">{car.brand}</TableCell>
                   <TableCell className="hidden md:table-cell">{car.model}</TableCell>
                   <TableCell className="hidden lg:table-cell">{car.year}</TableCell>
+                  <TableCell className="hidden lg:table-cell">${car.price}</TableCell>
                   <TableCell>{car.status}</TableCell>
                   <TableCell className="hidden lg:table-cell">{car.totalKilometers}</TableCell>
                   <TableCell

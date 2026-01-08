@@ -1,57 +1,91 @@
-import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import DashboardLayout from './components/layout/DashboardLayout';
-import LoginPage from './pages/LoginPage';
-import CarManagementPage from './pages/CarManagementPage';
-import DashboardPage from './pages/DashboardPage';
-import PublicCarListingPage from './pages/PublicCarListingPage';
+import { useState, useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  Outlet,
+} from "react-router-dom";
+import DashboardLayout from "./components/layout/DashboardLayout";
+import LoginPage from "./pages/LoginPage";
+import CarManagementPage from "./pages/CarManagementPage";
+import DashboardPage from "./pages/DashboardPage";
+import PublicCarListingPage from "./pages/PublicCarListingPage";
+import MainLayout from "./components/layout/MainLayout";
 
 function App() {
- 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); // Add loading state
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem("accessToken");
+    const adminStatus = localStorage.getItem("isAdmin");
     if (token) {
       setIsAuthenticated(true);
+      setIsAdmin(adminStatus ? JSON.parse(adminStatus) : false);
     }
-    setIsLoading(false); // Finish loading after checking token
+    setIsLoading(false);
   }, []);
 
-  const handleLoginSuccess = () => {
+  const handleLoginSuccess = (isAdminResponse: boolean) => {
     setIsAuthenticated(true);
+    setIsAdmin(isAdminResponse);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('accessToken');
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("isAdmin");
     setIsAuthenticated(false);
+    setIsAdmin(false);
   };
 
   if (isLoading) {
-    return <div>Loading...</div>; // Or a spinner component
+    return <div>Loading...</div>;
   }
 
+  // Component to protect admin routes
+  const AdminRoutes = () => {
+    return isAuthenticated && isAdmin ? (
+      <DashboardLayout/>
+
+    ) : (
+      <Navigate to="/login" replace />
+    );
+  };
   return (
     <Router>
       <Routes>
-        {isAuthenticated ? (
-          // Authenticated Routes
-          <Route element={<DashboardLayout onLogout={handleLogout} />}>
+        <Route
+          element={
+            <MainLayout
+              isAuthenticated={isAuthenticated}
+              isAdmin={isAdmin}
+              onLogout={handleLogout}
+            />
+          }
+        >
+          <Route path="/" element={<PublicCarListingPage />} />
+          <Route
+            path="/login"
+            element={
+              isAuthenticated ? (
+                <Navigate to={isAdmin ? "/dashboard" : "/"} replace />
+              ) : (
+                <LoginPage onLoginSuccess={handleLoginSuccess} />
+              )
+            }
+          />
+
+          {/* Admin Routes */}
+          <Route element={<AdminRoutes />}>
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/cars" element={<CarManagementPage />} />
-            {/* Redirect any other authenticated path to the dashboard */}
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Route>
-        ) : (
-          // Public Routes
-          <>
-            <Route path="/" element={<PublicCarListingPage />} />
-            <Route path="/login" element={<LoginPage onLoginSuccess={handleLoginSuccess} />} />
-            {/* Redirect any other unauthenticated path to the login page */}
-            <Route path="*" element={<Navigate to="/login" replace />} />
-          </>
-        )}
+
+          {/* Catch-all route */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
       </Routes>
     </Router>
   );

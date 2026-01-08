@@ -10,6 +10,7 @@ interface CarFormValues {
   brand: string;
   model: string;
   year: number;
+  price: number;
   specifications: string[];
   totalKilometers: number;
   kilometersSinceLastMaintenance?: number;
@@ -29,6 +30,7 @@ const CarForm: React.FC<CarFormProps> = ({ initialValues, onSubmit, onCancel, is
     brand: '',
     model: '',
     year: new Date().getFullYear(),
+    price: 0,
     specifications: [],
     totalKilometers: 0,
     status: 'AVAILABLE',
@@ -58,7 +60,7 @@ const CarForm: React.FC<CarFormProps> = ({ initialValues, onSubmit, onCancel, is
     const { id, value } = e.target;
     setFormValues((prev) => ({
       ...prev,
-      [id]: id === 'year' || id === 'totalKilometers' || id === 'kilometersSinceLastMaintenance'
+      [id]: id === 'year' || id === 'totalKilometers' || id === 'kilometersSinceLastMaintenance' || id === 'price'
         ? Number(value)
         : value,
     }));
@@ -102,6 +104,12 @@ const CarForm: React.FC<CarFormProps> = ({ initialValues, onSubmit, onCancel, is
           Year
         </Label>
         <Input id="year" type="number" value={formValues.year} onChange={handleChange} className="col-span-3" required />
+      </div>
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="price" className="text-right">
+          Price (per day)
+        </Label>
+        <Input id="price" type="number" value={formValues.price} onChange={handleChange} className="col-span-3" required />
       </div>
       <div className="grid grid-cols-4 items-center gap-4">
         <Label htmlFor="specifications" className="text-right">

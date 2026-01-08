@@ -1,15 +1,9 @@
 import React, { useState } from 'react';
 import { Link, Outlet } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu, Car, LayoutDashboard } from 'lucide-react';
-import { ModeToggle } from '@/components/mode-toggle';
 
-interface DashboardLayoutProps {
-  onLogout: () => void;
-}
-
-const DashboardLayout: React.FC<DashboardLayoutProps> = ({ onLogout }) => {
+const DashboardLayout: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navItems = [
@@ -52,35 +46,24 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ onLogout }) => {
 
       {/* Main content area */}
       <div className="flex flex-col">
-        {/* Header */}
-        <header className="flex h-14 items-center gap-4 border-b bg-gray-100/40 px-4 lg:h-[60px] lg:px-6 dark:bg-gray-800/40">
-          {/* Mobile Sidebar Toggle */}
-          <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="icon" className="shrink-0 md:hidden">
-                <Menu className="h-5 w-5" />
-                <span className="sr-only">Toggle navigation menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="flex flex-col">
-              <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
-                <Link to="/" className="flex items-center gap-2 font-semibold">
-                  <Car className="h-6 w-6" />
-                  <span>Car Admin</span>
-                </Link>
-              </div>
-              <SidebarContent />
-            </SheetContent>
-          </Sheet>
-
-                     <div className="w-full flex-1">
-                       {/* Can add search bar here in the future */}
-                     </div>
-                     <ModeToggle />
-                     <Button onClick={onLogout}>
-                       Logout
-                     </Button>
-                   </header>
+        {/* Mobile Sidebar Toggle */}
+        <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
+          <SheetTrigger asChild>
+            <button className="md:hidden p-4">
+              <Menu className="h-5 w-5" />
+              <span className="sr-only">Toggle navigation menu</span>
+            </button>
+          </SheetTrigger>
+          <SheetContent side="left" className="flex flex-col">
+            <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
+              <Link to="/" className="flex items-center gap-2 font-semibold">
+                <Car className="h-6 w-6" />
+                <span>Car Admin</span>
+              </Link>
+            </div>
+            <SidebarContent />
+          </SheetContent>
+        </Sheet>
         {/* Page content */}
         <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
           <Outlet /> {/* Render nested routes here */}

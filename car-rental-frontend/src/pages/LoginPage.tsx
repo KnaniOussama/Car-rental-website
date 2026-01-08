@@ -4,7 +4,7 @@ import { Button } from '../components/ui/button';
 import api from '../services/api'; // Import the API service
 
 interface LoginPageProps {
-  onLoginSuccess: () => void;
+  onLoginSuccess: (isAdmin: boolean) => void;
 }
 
 const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
@@ -20,8 +20,10 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
     try {
       const response = await api.post('/auth/login', { email, password });
-      localStorage.setItem('accessToken', response.data.access_token);
-      onLoginSuccess();
+      const { access_token, isAdmin } = response.data;
+      localStorage.setItem('accessToken', access_token);
+      localStorage.setItem('isAdmin', JSON.stringify(isAdmin));
+      onLoginSuccess(isAdmin);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Login failed. Please try again.');
     } finally {
@@ -32,7 +34,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
   return (
     <div className="flex justify-center items-center h-screen bg-background text-foreground">
       <div className="w-full max-w-md p-8 space-y-6 bg-card rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold text-center">Admin Login</h2>
+        <h2 className="text-2xl font-bold text-center">Login</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-foreground">

@@ -9,6 +9,7 @@ interface Car {
   brand: string;
   model: string;
   year: number;
+  price: number;
   specifications: string[];
   totalKilometers: number;
   image?: string;
@@ -62,6 +63,9 @@ const PublicCarListingPage: React.FC = () => {
                   <CardTitle className="text-xl">{car.brand} {car.model}</CardTitle>
                   <p className="text-sm text-muted-foreground">{car.year}</p>
                 </CardHeader>
+                <div className="px-6 py-4">
+                  <div className="text-2xl font-bold text-green-600">${car.price}/day</div>
+                </div>
                 <CardContent className="space-y-2 flex-grow">
                   <p><strong>Specifications:</strong> {car.specifications.join(', ')}</p>
                   <p><strong>Total Kilometers:</strong> {car.totalKilometers} km</p>
