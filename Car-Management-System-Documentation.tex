@@ -1,0 +1,353 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\usepackage{longtable}
+\usepackage{minted}
+\usepackage{graphicx}
+\usepackage{hyperref}
+
+\title{Car Allocation & Admin Management System}
+\author{AI Assistant}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\section{Introduction}
+
+This document provides a detailed technical overview of the Car Allocation & Admin Management System. The system is a web-based application designed for managing a fleet of cars. It consists of a React-based frontend for the user interface and a NestJS-based backend for the server-side logic. The data is stored in a MongoDB database.
+
+\section{Frontend Architecture}
+
+The frontend is a single-page application (SPA) built with React and TypeScript. It uses the Vite bundler for development and production builds. The UI is built using the shadcn/ui component library.
+
+\subsection{Project Structure}
+
+The frontend codebase is organized into the following directories:
+
+\begin{itemize}
+    \item \texttt{src/components}: Reusable UI components.
+    \item \texttt{src/config}: Application configuration files.
+    \item \texttt{src/contexts}: React context providers.
+    \item \texttt{src/hooks}: Custom React hooks.
+    \item \texttt{src/lib}: Utility functions.
+    \item \texttt{src/pages}: Application pages.
+    \item \texttt{src/services}: API service for communicating with the backend.
+\end{itemize}
+
+\subsection{Routing}
+
+The application uses React Router for routing. The main routing logic is defined in the \texttt{App.tsx} file. There are two main sets of routes: public routes and authenticated routes. Public routes are accessible to everyone, while authenticated routes are only accessible to logged-in users.
+
+\subsection{Authentication}
+
+Authentication is handled using JWT (JSON Web Tokens). When a user logs in, the backend generates a JWT and sends it to the frontend. The frontend stores the token in local storage and includes it in the headers of all subsequent requests to the backend.
+
+\subsection{State Management}
+
+The application uses a combination of local component state and React context for state management. For more complex state, a dedicated state management library like Redux or Zustand could be used.
+
+\section{Backend Architecture}
+
+The backend is a Node.js application built with the NestJS framework. It uses TypeScript and follows the modular architecture pattern.
+
+\subsection{Project Structure}
+
+The backend codebase is organized into the following modules:
+
+\begin{itemize}
+    \item \texttt{src/auth}: Handles user authentication and JWT generation.
+    \item \texttt{src/car}: Handles all car-related operations, including CRUD, status updates, and reporting.
+\end{itemize}
+
+\subsection{API Endpoints}
+
+The backend exposes a RESTful API for the frontend to consume. The API endpoints are defined in the controllers of each module.
+
+\subsection{Database}
+
+The backend uses MongoDB as its database. The database schema is defined using Mongoose, a MongoDB object modeling tool for Node.js.
+
+\subsection{Authentication}
+
+The backend uses Passport.js for authentication. It provides a local strategy for username/password authentication and a JWT strategy for token-based authentication.
+
+\section{Database Schema}
+
+The database schema is defined using Mongoose. There are three main collections: \texttt{cars}, \texttt{reports}, and \texttt{users}.
+
+\subsection{Cars Collection}
+
+The \texttt{cars} collection stores all the information about the cars in the fleet.
+
+\begin{minted}{typescript}
+@Schema({ timestamps: true })
+export class Car {
+  @Prop({ required: true })
+  brand: string;
+
+  @Prop({ required: true })
+  model: string;
+
+  @Prop({ required: true })
+  year: number;
+
+  @Prop([String]) // Array of strings for specifications
+  specifications: string[];
+
+  @Prop({ required: true })
+  totalKilometers: number;
+
+  @Prop({ default: 0 })
+  kilometersSinceLastMaintenance: number;
+
+  @Prop({ type: Date, default: Date.now })
+  lastMaintenanceDate: Date;
+
+  @Prop({
+    type: String,
+    enum: CarStatus,
+    default: CarStatus.AVAILABLE,
+  })
+  status: CarStatus;
+
+  @Prop()
+  image: string; // URL or path to the image
+
+  @Prop({ type: LocationSchema })
+  currentLocation: LocationSchema;
+}
+\end{minted}
+
+\subsection{Reports Collection}
+
+The \texttt{reports} collection stores all the health and inspection reports for the cars.
+
+\begin{minted}{typescript}
+@Schema({ timestamps: true })
+export class Report {
+  @Prop({ type: Types.ObjectId, ref: 'Car', required: true })
+  car: Types.ObjectId;
+
+  @Prop({ required: true })
+  description: string;
+
+  @Prop({
+    type: String,
+    enum: ReportSeverity,
+    default: ReportSeverity.LOW,
+  })
+  severity: ReportSeverity;
+
+  @Prop({ type: Date, default: Date.now })
+  createdAt: Date;
+}
+\end{minted}
+
+\subsection{Users Collection}
+
+The \texttt{users} collection stores the user information for the admin dashboard.
+
+\begin{minted}{typescript}
+@Schema()
+export class User {
+  @Prop({ required: true, unique: true })
+  email: string;
+
+  @Prop({ required: true })
+  password: string; // Hashed password
+
+  @Prop({ default: true })
+  isAdmin: boolean;
+}
+\end{minted}
+
+\subsection{Activity Log Collection}
+
+The \texttt{activitylogs} collection stores the activity logs for the cars.
+
+\begin{minted}{typescript}
+@Schema({ timestamps: true })
+export class ActivityLog {
+  @Prop({ type: Types.ObjectId, ref: 'Car', required: true })
+  car: Types.ObjectId;
+
+  @Prop({ type: String, enum: ActivityType, required: true })
+  activityType: ActivityType;
+
+  @Prop({ required: true })
+  description: string;
+
+  @Prop({ type: Date, default: Date.now })
+  timestamp: Date;
+}
+\end{minted}
+
+\section{API Documentation}
+
+\begin{longtable}{|p{0.15\linewidth}|p{0.25\linewidth}|p{0.6\linewidth}|}
+\hline
+\textbf{Endpoint} & \textbf{Method} & \textbf{Description} \\
+\hline
+\endhead
+\hline
+\multicolumn{3}{|r|}{{Continued on next page}} \\
+\hline
+\endfoot
+\hline
+\endlastfoot
+/auth/login & POST & Authenticates a user and returns a JWT. \\
+\hline
+/cars & GET & Returns a list of all available cars. \\
+\hline
+/cars/admin & GET & Returns a list of all cars (for admin). \\
+\hline
+/cars/stats & GET & Returns statistics about the cars. \\
+\hline
+/cars & POST & Creates a new car. \\
+\hline
+/cars/:id & GET & Returns a single car by ID. \\
+\hline
+/cars/:id & PUT & Updates a car by ID. \\
+\hline
+/cars/:id & DELETE & Deletes a car by ID. \\
+\hline
+/cars/:id/status & PUT & Updates the status of a car. \\
+\hline
+/cars/:id/simulate-location & PUT & Simulates a location update for a car. \\
+\hline
+/cars/:id/reports & POST & Adds a health/inspection report to a car. \\
+\hline
+/cars/:id/reports & GET & Returns all reports for a car. \\
+\hline
+/cars/:id/activity-logs & GET & Returns all activity logs for a car. \\
+\hline
+\end{longtable}
+
+\section{Diagrams}
+
+\subsection{Frontend Architecture}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{frontend.png}
+    \caption{Frontend Architecture}
+\end{figure}
+
+\subsection{Backend Architecture}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{backend.png}
+    \caption{Backend Architecture}
+\end{figure}
+
+\subsection{Database Schema}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{database.png}
+    \caption{Database Schema}
+\end{figure}
+
+\appendix
+\section{Mermaid Diagrams}
+
+\subsection{Frontend Architecture}
+\begin{minted}{mermaid}
+graph TD
+    A[User] --> B{React Router};
+    B --> C[Public Routes];
+    B --> D[Authenticated Routes];
+
+    C --> E[PublicCarListingPage];
+    C --> F[LoginPage];
+
+    D --> G[DashboardLayout];
+    G --> H[DashboardPage];
+    G --> I[CarManagementPage];
+
+    subgraph "Components"
+        J[shadcn/ui]
+    end
+
+    subgraph "Services"
+        K[api.ts]
+    end
+
+    H --> K;
+    I --> K;
+    F --> K;
+    K --> L[Backend API];
+\end{minted}
+
+\subsection{Backend Architecture}
+\begin{minted}{mermaid}
+graph TD
+    A[Frontend] --> B{NestJS};
+    B --> C[Auth Module];
+    B --> D[Car Module];
+
+    C --> E[AuthController];
+    C --> F[AuthService];
+    E --> F;
+    F --> G[User Schema];
+
+    D --> H[CarController];
+    D --> I[CarService];
+    H --> I;
+    I --> J[Car Schema];
+    I --> K[Report Schema];
+    I --> L[ActivityLog Schema];
+    I --> M[ActivityLog Service];
+
+    subgraph "Database (MongoDB)"
+        G;
+        J;
+        K;
+        L;
+    end
+\end{minted}
+
+\subsection{Database Schema}
+\begin{minted}{mermaid}
+erDiagram
+    CAR ||--o{ REPORT : "has"
+    CAR ||--o{ ACTIVITY_LOG : "has"
+    USER ||--|{ CAR : "manages"
+
+    CAR {
+        string brand
+        string model
+        int year
+        string[] specifications
+        int totalKilometers
+        int kilometersSinceLastMaintenance
+        date lastMaintenanceDate
+        string status
+        string image
+        LocationSchema currentLocation
+    }
+
+    REPORT {
+        ObjectId car
+        string description
+        string severity
+        date createdAt
+    }
+
+    ACTIVITY_LOG {
+        ObjectId car
+        string activityType
+        string description
+        date timestamp
+    }
+
+    USER {
+        string email
+        string password
+        boolean isAdmin
+    }
+\end{minted}
+
+\end{document}
