@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { DollarSign, BookOpen, Users, Car } from 'lucide-react';
+import { DollarSign, BookOpen, Users, Car, Wrench } from 'lucide-react';
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Pie, PieChart, Cell, Legend } from 'recharts';
 import api from '@/services/api';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -11,6 +11,8 @@ interface Kpis {
   totalBookings: number;
   totalUsers: number;
   totalCars: number;
+  totalMaintenanceCost: number;
+  avgMaintenanceCost: number;
 }
 
 interface ChartData {
@@ -44,7 +46,9 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
 const DashboardSkeleton: React.FC = () => (
   <div className="flex flex-col w-full gap-6">
     <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
+      <Skeleton className="h-28" />
+      <Skeleton className="h-28" />
       <Skeleton className="h-28" />
       <Skeleton className="h-28" />
       <Skeleton className="h-28" />
@@ -99,14 +103,14 @@ const DashboardPage: React.FC = () => {
       <h1 className="text-2xl font-bold">Admin Dashboard</h1>
       
       {/* KPIs Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${kpis.totalRevenue.toFixed(2)}</div>
+            <div className="text-2xl font-bold">${kpis.totalRevenue?.toFixed(2)}</div>
           </CardContent>
         </Card>
         <Card>
@@ -134,6 +138,24 @@ const DashboardPage: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{kpis.totalCars}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Maint. Cost</CardTitle>
+            <Wrench className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">${kpis.totalMaintenanceCost.toFixed(2)}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Avg. Maint. Cost</CardTitle>
+            <Wrench className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">${kpis.avgMaintenanceCost.toFixed(2)}</div>
           </CardContent>
         </Card>
       </div>

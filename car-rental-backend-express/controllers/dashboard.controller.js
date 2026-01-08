@@ -1,6 +1,7 @@
 const Booking = require('../models/booking.model');
 const Car = require('../models/car.model');
 const User = require('../models/user.model');
+const MaintenanceLog = require('../models/maintenance.model');
 const mongoose = require('mongoose');
 
 // @desc    Get analytics data for the admin dashboard
@@ -17,6 +18,16 @@ exports.getDashboardAnalytics = async (req, res) => {
     const totalBookings = await Booking.countDocuments({ status: 'CONFIRMED' });
     const totalUsers = await User.countDocuments();
     const totalCars = await Car.countDocuments();
+
+    // New Maintenance Cost KPIs
+    const totalMaintenanceCost = await MaintenanceLog.aggregate([
+      { $group: { _id: null, total: { $sum: '$cost' } } }
+    ]);
+    
+    const totalMaintenanceLogs = await MaintenanceLog.countDocuments();
+
+    const avgMaintenanceCost = totalMaintenanceLogs > 0 ? (totalMaintenanceCost[0]?.total || 0) / totalMaintenanceLogs : 0;
+
 
     // 2. Revenue Per Month Chart Data
     const revenuePerMonth = await Booking.aggregate([
@@ -65,6 +76,8 @@ exports.getDashboardAnalytics = async (req, res) => {
         totalBookings,
         totalUsers,
         totalCars,
+        totalMaintenanceCost: totalMaintenanceCost.length > 0 ? totalMaintenanceCost[0].total : 0,
+        avgMaintenanceCost,
       },
       charts: {
         revenuePerMonth: formattedRevenue,

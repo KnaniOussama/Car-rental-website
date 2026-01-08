@@ -10,6 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button'; // Import Button for location update
 import Map from '@/components/Map';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 // Car Interface matching backend schema
 interface Car {
@@ -198,14 +199,16 @@ const CarDetailsModal: React.FC<CarDetailsModalProps> = ({
           <div className="flex flex-col space-y-2">
             <h3 className="text-lg font-semibold">Activity Logs</h3>
             {activityLogs.length > 0 ? (
-              <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700">
-                {activityLogs.map((log) => (
-                  <li key={log._id}>
-                    [{new Date(log.timestamp).toLocaleDateString()}{' '}
-                    {new Date(log.timestamp).toLocaleTimeString()}] {log.description}
-                  </li>
-                ))}
-              </ul>
+              <ScrollArea className="h-64 w-full rounded-md border p-4">
+                <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700">
+                  {activityLogs.map((log) => (
+                    <li key={log._id}>
+                      [{new Date(log.timestamp).toLocaleDateString()}{' '}
+                      {new Date(log.timestamp).toLocaleTimeString()}] {log.description}
+                    </li>
+                  ))}
+                </ul>
+              </ScrollArea>
             ) : (
               <p className="text-gray-500">No activity logs found for this car.</p>
             )}

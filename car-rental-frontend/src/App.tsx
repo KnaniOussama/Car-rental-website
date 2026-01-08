@@ -4,6 +4,7 @@ import CarManagementPage from './pages/CarManagementPage';
 import DashboardPage from './pages/DashboardPage';
 import BookingsManagementPage from './pages/BookingsManagementPage';
 import UserManagementPage from './pages/UserManagementPage';
+import MaintenancePage from './pages/MaintenancePage';
 import PublicCarListingPage from './pages/PublicCarListingPage';
 import MainLayout from './components/layout/MainLayout';
 import BookingPage from './pages/BookingPage';
@@ -63,6 +64,7 @@ function App() {
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/bookings" element={<BookingsManagementPage />} />
               <Route path="/users" element={<UserManagementPage />} />
+              <Route path="/maintenance" element={<MaintenancePage />} />
               <Route path="/cars" element={<CarManagementPage />} />
             </Route>
             

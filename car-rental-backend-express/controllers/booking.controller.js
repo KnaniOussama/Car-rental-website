@@ -15,7 +15,14 @@ exports.createBooking = async (req, res) => {
     if (!car) {
       return res.status(404).json({ message: 'Car not found.' });
     }
+
+    // Check if the car is available before allowing a booking
+    if (car.status !== 'AVAILABLE') {
+      return res.status(400).json({ message: 'This car is not available for booking.' });
+    }
     
+    // In a real-world scenario, you would also check for car availability for the selected dates.
+    // This is a complex feature, so we'll omit it for now as per the project scope.
 
     const newBooking = new Booking({
       user: new mongoose.Types.ObjectId(userId),
@@ -29,6 +36,10 @@ exports.createBooking = async (req, res) => {
     });
 
     await newBooking.save();
+
+    // After booking is successful, update the car's status
+    car.status = 'RESERVED';
+    await car.save();
 
     res.status(201).json(newBooking);
   } catch (error) {

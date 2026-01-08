@@ -1,6 +1,7 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Navbar from './Navbar';
+import Chatbot from '../Chatbot';
 
 interface MainLayoutProps {
   isAuthenticated: boolean;
@@ -15,6 +16,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ isAuthenticated, isAdmin, onLog
       <main className="flex-1">
         <Outlet />
       </main>
+      <Chatbot />
     </div>
   );
 };

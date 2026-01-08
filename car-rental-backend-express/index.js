@@ -21,11 +21,15 @@ const carRoutes = require('./routes/car.routes.js');
 const bookingRoutes = require('./routes/booking.routes.js');
 const userRoutes = require('./routes/user.routes.js');
 const dashboardRoutes = require('./routes/dashboard.routes.js');
+const maintenanceRoutes = require('./routes/maintenance.routes.js');
+const chatbotRoutes = require('./routes/chatbot.routes.js');
 app.use('/auth', authRoutes);
 app.use('/cars', carRoutes);
 app.use('/bookings', bookingRoutes);
 app.use('/users', userRoutes);
 app.use('/dashboard', dashboardRoutes);
+app.use('/maintenance', maintenanceRoutes);
+app.use('/chatbot', chatbotRoutes);
 app.get('/', (req, res) => {
   res.send('Hello from Express!');
 });
