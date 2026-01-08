@@ -125,20 +125,47 @@ const BookingPage: React.FC<BookingPageProps> = ({ isAuthenticated }) => {
     setFormData(prev => ({ ...prev, [id]: value }));
   };
 
-  const handleBooking = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleBooking = async () => {
     if (!isAuthenticated) {
       openAuthModal();
-    } else {
-      // In a real app, this would proceed to a payment gateway or booking confirmation
-      console.log('User is authenticated, proceeding with booking:', {
-        carId,
-        dateRange,
-        options,
-        insurance,
-        formData,
-        totalPrice,
-      });
-      alert('Booking successful! (See console for details)');
+      return;
+    }
+
+    if (!car || !dateRange?.from || !dateRange?.to) {
+      alert('Please select a valid date range.');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    const bookingData = {
+      car: car._id,
+      startDate: dateRange.from.toISOString(),
+      endDate: dateRange.to.toISOString(),
+      totalPrice,
+      options,
+      insurance,
+      userDetails: {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        dateOfBirth: formData.dateOfBirth,
+        country: formData.country,
+      },
+    };
+
+    try {
+      await api.post('/bookings', bookingData);
+      alert('Booking successful! You will be redirected to the home page.');
+      // In a real app, you might redirect to a "My Bookings" page
+      window.location.href = '/'; 
+    } catch (err: any) {
+      alert(`Booking failed: ${err.response?.data?.message || 'Please try again.'}`);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 

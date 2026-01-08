@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, Car, LayoutDashboard } from 'lucide-react';
+import { Menu, Car, LayoutDashboard, CalendarCheck, Users } from 'lucide-react';
 
 const DashboardLayout: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navItems = [
     { to: '/dashboard', icon: <LayoutDashboard className="h-4 w-4" />, label: 'Dashboard' },
+    { to: '/bookings', icon: <CalendarCheck className="h-4 w-4" />, label: 'Bookings' },
+    { to: '/users', icon: <Users className="h-4 w-4" />, label: 'Users' },
     { to: '/cars', icon: <Car className="h-4 w-4" />, label: 'Cars Management' },
   ];
 

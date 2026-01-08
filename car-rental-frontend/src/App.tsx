@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-
 import DashboardLayout from './components/layout/DashboardLayout';
 import CarManagementPage from './pages/CarManagementPage';
 import DashboardPage from './pages/DashboardPage';
+import BookingsManagementPage from './pages/BookingsManagementPage';
+import UserManagementPage from './pages/UserManagementPage';
 import PublicCarListingPage from './pages/PublicCarListingPage';
 import MainLayout from './components/layout/MainLayout';
 import BookingPage from './pages/BookingPage';
@@ -42,9 +44,7 @@ function App() {
   // Component to protect admin routes
   const AdminRoutes = () => {
     return isAuthenticated && isAdmin ? (
-      <DashboardLayout>
-        <Outlet />
-      </DashboardLayout>
+      <DashboardLayout/>
     ) : (
       <Navigate to="/" replace />
     );
@@ -61,6 +61,8 @@ function App() {
             {/* Admin Routes */}
             <Route element={<AdminRoutes />}>
               <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/bookings" element={<BookingsManagementPage />} />
+              <Route path="/users" element={<UserManagementPage />} />
               <Route path="/cars" element={<CarManagementPage />} />
             </Route>
             

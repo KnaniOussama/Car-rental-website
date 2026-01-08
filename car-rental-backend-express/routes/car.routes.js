@@ -1,25 +1,25 @@
 const express = require('express');
 const router = express.Router();
 const carController = require('../controllers/car.controller');
-const authMiddleware = require('../middleware/auth.middleware');
 const validate = require('../middleware/validation.middleware');
 const { createCarSchema, updateCarSchema, carStatusSchema } = require('../validators/car.validator');
 const { createReportSchema } = require('../validators/report.validator');
+const { protect, admin } = require('../middleware/auth.middleware');
 
 // Public routes
 router.get('/', carController.getAvailableCars);
 
 // Admin routes
-router.post('/', authMiddleware, validate(createCarSchema), carController.createCar);
-router.get('/admin', authMiddleware, carController.getAllCars);
-router.get('/stats', authMiddleware, carController.getCarStats);
+router.post('/',  protect, admin, validate(createCarSchema), carController.createCar);
+router.get('/admin', protect, admin, carController.getAllCars);
+router.get('/stats', protect, admin, carController.getCarStats);
 router.get('/:id', carController.getCarById);
-router.put('/:id', authMiddleware, validate(updateCarSchema), carController.updateCar);
-router.delete('/:id', authMiddleware, carController.deleteCar);
-router.put('/:id/status', authMiddleware, validate(carStatusSchema), carController.updateCarStatus);
-router.put('/:id/simulate-location', authMiddleware, carController.simulateLocationUpdate);
-router.post('/:id/reports', authMiddleware, validate(createReportSchema), carController.addReport);
-router.get('/:id/reports', authMiddleware, carController.getReportsByCarId);
-router.get('/:id/activity-logs', authMiddleware, carController.getActivityLogsByCarId);
+router.put('/:id', protect, admin, validate(updateCarSchema), carController.updateCar);
+router.delete('/:id', protect, admin, carController.deleteCar);
+router.put('/:id/status', protect, admin, validate(carStatusSchema), carController.updateCarStatus);
+router.put('/:id/simulate-location', protect, admin, carController.simulateLocationUpdate);
+router.post('/:id/reports', protect, admin, validate(createReportSchema), carController.addReport);
+router.get('/:id/reports', protect, admin, carController.getReportsByCarId);
+router.get('/:id/activity-logs', protect, admin, carController.getActivityLogsByCarId);
 
 module.exports = router;
