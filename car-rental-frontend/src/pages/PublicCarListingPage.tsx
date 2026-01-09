@@ -158,7 +158,6 @@ const PublicCarListingPage: React.FC = () => {
                       </div>
                     </CardContent>
                     <CardFooter>
-                      <Button  onClick={()=>{toast("Hello"); console.log("hello")}}>Hello</Button>
                       <Button asChild className="w-full">
                         <Link to={`/book/${car._id}`}>Book Now</Link>
                       </Button>

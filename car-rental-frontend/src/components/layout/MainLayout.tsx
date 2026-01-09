@@ -3,6 +3,7 @@ import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar";
 import Chatbot from "../Chatbot";
 import { Toaster } from "../ui/sonner";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 
 interface MainLayoutProps {
   isAuthenticated: boolean;
@@ -16,6 +17,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
   onLogout,
 }) => {
   return (
+   <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
     <div className="flex flex-col min-h-screen">
       <Navbar
         isAuthenticated={isAuthenticated}
@@ -27,7 +29,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({
       </main>
       <Chatbot />
       <Toaster position="top-center"/>
+    
     </div>
+    </ThemeProvider>
   );
 };
 
