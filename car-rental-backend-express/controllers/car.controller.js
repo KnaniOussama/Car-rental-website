@@ -20,7 +20,9 @@ exports.createCar = async (req, res) => {
 
 exports.getAvailableCars = async (req, res) => {
   try {
-    const cars = await Car.find({ status: 'AVAILABLE' });
+    const cars = (await Car.find({ status: 'AVAILABLE' })).sort((a, b) => {
+      return a.price - b.price;
+    });
     res.json(cars);
   } catch (error) {
     res.status(500).json({ message: error.message });
