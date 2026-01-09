@@ -6,9 +6,16 @@ import { Slider } from '@/components/ui/slider';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Car as CarIcon, GaugeCircle, Users } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Car as CarIcon, GaugeCircle, Users, ListFilter } from 'lucide-react';
 import api from '@/services/api';
-import { toast } from 'sonner';
 
 // Car Interface matching backend schema
 interface Car {
@@ -26,9 +33,8 @@ const PublicCarListingPage: React.FC = () => {
   const [cars, setCars] = useState<Car[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  
-  // State for the slider values
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
+  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchAvailableCars = async () => {
@@ -46,21 +52,30 @@ const PublicCarListingPage: React.FC = () => {
     fetchAvailableCars();
   }, []);
 
-  // Calculate the absolute min and max price from the car data
   const priceBounds = useMemo<[number, number]>(() => {
-    if (cars.length === 0) {
-      return [0, 1000]; // Default range if no cars are loaded
-    }
+    if (cars.length === 0) return [0, 1000];
     const prices = cars.map(car => car.price || 0);
     const min = Math.min(...prices);
     const max = Math.max(...prices);
-    return [min, max];
+    return [min > 0 ? min : 0, max > 0 ? max : 1000];
   }, [cars]);
 
-  // When car data is loaded, update the slider's range and set the thumbs to the full range
   useEffect(() => {
     setPriceRange(priceBounds);
   }, [priceBounds]);
+  
+  const uniqueBrands = useMemo(() => {
+    const brands = new Set(cars.map(car => car.brand));
+    return Array.from(brands).sort();
+  }, [cars]);
+  
+  const handleBrandChange = (brand: string) => {
+    setSelectedBrands(prev => 
+      prev.includes(brand) 
+        ? prev.filter(b => b !== brand) 
+        : [...prev, brand]
+    );
+  };
 
   const filteredCars = useMemo(() => {
     return cars.filter(car => {
@@ -74,9 +89,13 @@ const PublicCarListingPage: React.FC = () => {
       
       const matchesPrice = carPrice >= min && carPrice <= max;
       
-      return matchesSearch && matchesPrice;
+      const matchesBrand = selectedBrands.length > 0
+        ? selectedBrands.includes(car.brand)
+        : true;
+        
+      return matchesSearch && matchesPrice && matchesBrand;
     });
-  }, [cars, searchTerm, priceRange]);
+  }, [cars, searchTerm, priceRange, selectedBrands]);
 
   return (
     <div className="bg-background min-h-screen">
@@ -87,7 +106,7 @@ const PublicCarListingPage: React.FC = () => {
 
       {/* Filter Section */}
       <div className="container mx-auto py-6 px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 rounded-lg bg-card border">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 rounded-lg bg-card border">
           <div className="space-y-2">
             <Label htmlFor="search">Search by Brand or Model</Label>
             <Input
@@ -111,6 +130,31 @@ const PublicCarListingPage: React.FC = () => {
               <span>${priceRange[0]}</span>
               <span>${priceRange[1]}</span>
             </div>
+          </div>
+          <div className="space-y-2">
+             <Label>Brand</Label>
+             <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="w-full justify-start">
+                    <ListFilter className="mr-2 h-4 w-4" />
+                    Filter by Brand
+                    {selectedBrands.length > 0 && <span className="ml-auto bg-primary text-primary-foreground text-xs rounded-full px-2 py-0.5">{selectedBrands.length}</span>}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56">
+                  <DropdownMenuLabel>Available Brands</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {uniqueBrands.map(brand => (
+                    <DropdownMenuCheckboxItem
+                      key={brand}
+                      checked={selectedBrands.includes(brand)}
+                      onCheckedChange={() => handleBrandChange(brand)}
+                    >
+                      {brand}
+                    </DropdownMenuCheckboxItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
           </div>
         </div>
       </div>
