@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'; // Default to backend's default port
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'; 
 
 const api = axios.create({
   baseURL: API_URL,
@@ -22,14 +22,12 @@ api.interceptors.request.use(
   },
 );
 
-// Optional: Add a response interceptor to handle token expiration or 401 errors globally
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      // Handle unauthorized errors, e.g., redirect to login
       localStorage.removeItem('accessToken');
-      window.location.href = '/login'; // Or use react-router-dom's navigate
+      window.location.href = '/login'; 
     }
     return Promise.reject(error);
   },

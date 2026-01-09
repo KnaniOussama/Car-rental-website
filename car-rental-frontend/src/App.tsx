@@ -10,6 +10,7 @@ import MainLayout from './components/layout/MainLayout';
 import BookingPage from './pages/BookingPage';
 import { AuthModalProvider } from './contexts/AuthModalContext';
 import { useEffect, useState } from 'react';
+import { Toaster } from "@/components/ui/sonner"
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -42,7 +43,6 @@ function App() {
     return <div>Loading...</div>;
   }
 
-  // Component to protect admin routes
   const AdminRoutes = () => {
     return isAuthenticated && isAdmin ? (
       <DashboardLayout/>
@@ -58,8 +58,6 @@ function App() {
           <Route element={<MainLayout isAuthenticated={isAuthenticated} isAdmin={isAdmin} onLogout={handleLogout} />}>
             <Route path="/" element={<PublicCarListingPage />} />
             <Route path="/book/:carId" element={<BookingPage isAuthenticated={isAuthenticated} />} />
-            
-            {/* Admin Routes */}
             <Route element={<AdminRoutes />}>
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/bookings" element={<BookingsManagementPage />} />
@@ -67,8 +65,6 @@ function App() {
               <Route path="/maintenance" element={<MaintenancePage />} />
               <Route path="/cars" element={<CarManagementPage />} />
             </Route>
-            
-            {/* Catch-all route */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>

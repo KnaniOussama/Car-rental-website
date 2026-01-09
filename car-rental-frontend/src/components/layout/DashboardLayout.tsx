@@ -47,9 +47,7 @@ const DashboardLayout: React.FC = () => {
         </div>
       </aside>
 
-      {/* Main content area */}
       <div className="flex flex-col">
-        {/* Mobile Sidebar Toggle */}
         <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
           <SheetTrigger asChild>
             <button className="md:hidden p-4">
@@ -67,9 +65,8 @@ const DashboardLayout: React.FC = () => {
             <SidebarContent />
           </SheetContent>
         </Sheet>
-        {/* Page content */}
         <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-          <Outlet /> {/* Render nested routes here */}
+          <Outlet />
         </main>
       </div>
     </div>

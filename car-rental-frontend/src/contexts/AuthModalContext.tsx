@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import RegisterForm from '@/pages/Register';
-import LoginForm from '@/pages/LoginForm'; // Assuming you've created this
+import LoginForm from '@/pages/LoginForm';
 
 interface AuthModalContextType {
   openAuthModal: () => void;

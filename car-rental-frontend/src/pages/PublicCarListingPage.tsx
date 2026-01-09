@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Car as CarIcon, GaugeCircle, Users } from 'lucide-react';
 import api from '@/services/api';
+import { toast } from 'sonner';
 
 // Car Interface matching backend schema
 interface Car {
@@ -157,6 +158,7 @@ const PublicCarListingPage: React.FC = () => {
                       </div>
                     </CardContent>
                     <CardFooter>
+                      <Button  onClick={()=>{toast("Hello"); console.log("hello")}}>Hello</Button>
                       <Button asChild className="w-full">
                         <Link to={`/book/${car._id}`}>Book Now</Link>
                       </Button>
